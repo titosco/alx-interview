@@ -1,39 +1,39 @@
 
 #!/usr/bin/python3
-"""Solution to the N-Queens puzzle"""
+"""Solving N Queens Problem using backtracking"""
 import sys
 
 
-def print_board(board, n):
-    """prints allocated possitions to the queen"""
-    b = []
+def printSolution(board, n):
+    """Print allocated positions to the queen"""
+    solution = []
 
-    for i in range(n):
-        for j in range(n):
-            if j == board[i]:
-                b.append([i, j])
-    print(b)
-
-
-def safe_position(board, i, j, r):
-    """Determines whether the position is safe for the queen"""
-    return board[i] in (j, j - i + r, i - r + j)
+    for r in range(n):
+        for c in range(n):
+            if c == board[r]:
+                solution.append([r, c])
+    print(solution)
 
 
-def determine_positions(board, row, n):
-    """Recursively finds all safe positions where the queen can be allocated"""
+def is_position_safe(board, r, c, row):
+    """Checks if the position is safe for the queen"""
+    return board[r] in (c, c - r + row, r - row + c)
+
+
+def recursive_solve(board, row, n):
+    """Find all safe positions where the queen can be allocated"""
     if row == n:
-        print_board(board, n)
+        printSolution(board, n)
 
     else:
-        for j in range(n):
+        for c in range(n):
             allowed = True
-            for i in range(row):
-                if safe_position(board, i, j, row):
+            for r in range(row):
+                if is_position_safe(board, r, c, row):
                     allowed = False
             if allowed:
-                board[row] = j
-                determine_positions(board, row + 1, n)
+                board[row] = c
+                recursive_solve(board, row + 1, n)
 
 
 def create_board(size):
@@ -41,21 +41,18 @@ def create_board(size):
     return [0 * size for i in range(size)]
 
 
-if len(sys.argv) != 2:
-    print("Usage: nqueens N")
-    exit(1)
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+    if sys.argv[1].isdigit() is False:
+        print("N must be a number")
+        sys.exit(1)
+    if int(sys.argv[1]) < 4:
+        print("N must be at least 4")
+        sys.exit(1)
 
-try:
-    n = int(sys.argv[1])
-except BaseException:
-    print("N must be a number")
-    exit(1)
-
-if (n < 4):
-    print("N must be at least 4")
-    exit(1)
-
-board = create_board(int(n))
-row = 0
-determine_positions(board, row, int(n))
+    N = int(sys.argv[1])
+    myboard = create_board(N)
+    solutions = recursive_solve(myboard, 0, N)
 
