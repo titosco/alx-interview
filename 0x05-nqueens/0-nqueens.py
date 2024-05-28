@@ -1,58 +1,58 @@
-
 #!/usr/bin/python3
-"""Solving N Queens Problem using backtracking"""
+"""This script solves the N-Queens problem"""
+
 import sys
 
+if len(sys.argv) != 2:
+    print("Usage: nqueens N")
+    exit(1)
 
-def printSolution(board, n):
-    """Print allocated positions to the queen"""
-    solution = []
-
-    for r in range(n):
-        for c in range(n):
-            if c == board[r]:
-                solution.append([r, c])
-    print(solution)
-
-
-def is_position_safe(board, r, c, row):
-    """Checks if the position is safe for the queen"""
-    return board[r] in (c, c - r + row, r - row + c)
-
-
-def recursive_solve(board, row, n):
-    """Find all safe positions where the queen can be allocated"""
-    if row == n:
-        printSolution(board, n)
-
-    else:
-        for c in range(n):
-            allowed = True
-            for r in range(row):
-                if is_position_safe(board, r, c, row):
-                    allowed = False
-            if allowed:
-                board[row] = c
-                recursive_solve(board, row + 1, n)
-
-
-def create_board(size):
-    """Generates the board"""
-    return [0 * size for i in range(size)]
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: nqueens N")
-        sys.exit(1)
-    if sys.argv[1].isdigit() is False:
-        print("N must be a number")
-        sys.exit(1)
-    if int(sys.argv[1]) < 4:
-        print("N must be at least 4")
-        sys.exit(1)
-
+try:
     N = int(sys.argv[1])
-    myboard = create_board(N)
-    solutions = recursive_solve(myboard, 0, N)
+except ValueError:
+    print("N must be a number")
+    exit(1)
 
+if N < 4:
+    print("N must be at least 4")
+    exit(1)
+
+columns = set()
+pos_diagonal = set()
+neg_diagonal = set()
+board = []
+
+# create the board positions
+for _ in range(N):
+    row = [0] * 2
+    board.append(row)
+
+
+def is_safe(r, c):
+    """Check if a queen can be placed at position (r, c)"""
+    if c in columns or (r + c) in pos_diagonal or (r - c) in neg_diagonal:
+        return False
+    return True
+
+
+def solve_n_queens(r):
+    """recursively places N queens on an N x N chessboard"""
+    if r == N:
+        print(board)
+        return
+
+    for c in range(N):
+        if is_safe(r, c):
+            columns.add(c)
+            pos_diagonal.add(r + c)
+            neg_diagonal.add(r - c)
+            board[r] = [r, c]
+            solve_n_queens(r + 1)
+            # Backtrack
+            columns.remove(c)
+            pos_diagonal.remove(r + c)
+            neg_diagonal.remove(r - c)
+            board[r] = [0, 0]
+
+
+solve_n_queens(0)
